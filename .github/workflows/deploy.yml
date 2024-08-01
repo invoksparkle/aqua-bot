@@ -14,17 +14,22 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up SSH
+      id: setup_ssh
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Generate .env file
-      run: |
-        echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} > .env
+      run: echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} > .env
 
     - name: Sync files to server
+      env:
+        RSYNC_RSH: "ssh -o StrictHostKeyChecking=no"
       run: |
-        rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" . ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/opt/aquabot
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" . ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/opt/aquabot
 
     - name: SSH to Server and Deploy
       uses: appleboy/ssh-action@master
