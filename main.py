@@ -15,26 +15,24 @@ async def on_ready():
     await clear_guild_commands()
 
 async def clear_global_commands():
-    global_commands = await bot.http.get_global_application_commands(bot.user.id)
+    global_commands = await bot.tree.fetch_global_commands()
     for command in global_commands:
-        await bot.http.delete_global_application_command(bot.user.id, command['id'])
+        await bot.tree.delete_global_command(command.id)
     print('Cleared all global commands.')
 
 async def clear_guild_commands():
     for guild in bot.guilds:
-        guild_commands = await bot.http.get_guild_application_commands(bot.user.id, guild.id)
+        guild_commands = await bot.tree.fetch_guild_commands(guild.id)
         for command in guild_commands:
-            await bot.http.delete_guild_application_command(bot.user.id, guild.id, command['id'])
+            await bot.tree.delete_guild_command(guild.id, command.id)
         print(f'Cleared all commands in guild: {guild.name}')
 
-@bot.slash_command(name="hello", description="Say hello")
-async def hello(ctx: discord.ApplicationContext):
-    await ctx.respond('Hello!')
+@bot.tree.command(name="hello", description="Say hello")
+async def hello(ctx: discord.Interaction):
+    await ctx.response.send_message('Hello!')
 
 @bot.event
 async def on_guild_join(guild):
     await clear_guild_commands()
 
-bot.loop.create_task(clear_global_commands())
-bot.loop.create_task(clear_guild_commands())
 bot.run(os.getenv('DISCORD_TOKEN'))
