@@ -22,14 +22,12 @@ jobs:
       run: |
         echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} > .env
 
-    - name: Copy files to server
-      uses: appleboy/scp-action@master
-      with:
-        source: "."
-        target: "/opt/aquabot"
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
+    - name: Sync files to server
+      run: |
+        rsync -avz --delete . ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/opt/aquabot
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        RSYNC_RSH: 'ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no'
 
     - name: SSH to Server and Deploy
       uses: appleboy/ssh-action@master
