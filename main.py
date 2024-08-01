@@ -28,8 +28,8 @@ async def clear_guild_commands():
         print(f'Cleared all commands in guild: {guild.name}')
 
 @bot.tree.command(name="hello", description="Say hello")
-async def hello(ctx: discord.Interaction):
-    await ctx.response.send_message('Hello!')
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message('Hello!')
 
 @bot.event
 async def on_guild_join(guild):
