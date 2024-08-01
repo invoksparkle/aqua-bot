@@ -24,10 +24,7 @@ jobs:
 
     - name: Sync files to server
       run: |
-        rsync -avz --delete . ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/opt/aquabot
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        RSYNC_RSH: 'ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no'
+        rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" . ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/opt/aquabot
 
     - name: SSH to Server and Deploy
       uses: appleboy/ssh-action@master
