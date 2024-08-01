@@ -15,16 +15,16 @@ async def on_ready():
     await clear_guild_commands()
 
 async def clear_global_commands():
-    global_commands = await bot.tree.fetch_global_commands()
+    global_commands = await bot.http.get_global_application_commands(bot.user.id)
     for command in global_commands:
-        await bot.tree.remove_command(command.id, type=discord.AppCommandType.chat_input)
+        await bot.http.delete_global_application_command(bot.user.id, command['id'])
     print('Cleared all global commands.')
 
 async def clear_guild_commands():
     for guild in bot.guilds:
-        guild_commands = await bot.tree.fetch_guild_commands(guild.id)
+        guild_commands = await bot.http.get_guild_application_commands(bot.user.id, guild.id)
         for command in guild_commands:
-            await bot.tree.remove_command(command.id, guild=guild, type=discord.AppCommandType.chat_input)
+            await bot.http.delete_guild_application_command(bot.user.id, guild.id, command['id'])
         print(f'Cleared all commands in guild: {guild.name}')
 
 @bot.slash_command(name="hello", description="Say hello")
