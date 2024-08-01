@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  aquabot:
+    build: .
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
