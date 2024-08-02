@@ -55,13 +55,17 @@ async def play(ctx: discord.ApplicationContext, url: str):
     
     vc = await voice_channel.connect()
     
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        url2 = info['formats'][0]['url']
-        source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
-        vc.play(source)
-    
-    await ctx.respond(f"Воспроизведение: {url}")
+    try:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            url2 = info['formats'][0]['url']
+            logger.info(f'URL for streaming: {url2}')
+            source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
+            vc.play(source)
+            await ctx.respond(f"Воспроизведение: {url}")
+    except Exception as e:
+        logger.error(f'Error while playing audio: {e}')
+        await ctx.respond("Произошла ошибка при попытке воспроизвести аудио.")
 
 @bot.slash_command(guild_ids=[GUILD_ID])
 async def stop(ctx: discord.ApplicationContext):
