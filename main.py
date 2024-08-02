@@ -22,11 +22,18 @@ GUILD_ID = int(GUILD_ID)
 # Настройка yt-dlp
 ydl_opts = {
     'format': 'bestaudio/best',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': '192',
-    }],
+    'noplaylist': True,
+    'extractaudio': True,
+    'audioformat': 'mp3',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noprogress': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': True,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'source_address': '0.0.0.0',
 }
 
 ffmpeg_options = {
@@ -58,11 +65,13 @@ async def play(ctx: discord.ApplicationContext, url: str):
     try:
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
-            url2 = info['formats'][0]['url']
+            if 'entries' in info:
+                info = info['entries'][0]
+            url2 = info['url']
             logger.info(f'URL for streaming: {url2}')
             source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
             vc.play(source)
-            await ctx.respond(f"Воспроизведение: {url}")
+            await ctx.respond(f"Воспроизведение: {info['title']}")
     except Exception as e:
         logger.error(f'Error while playing audio: {e}')
         await ctx.respond("Произошла ошибка при попытке воспроизвести аудио.")
