@@ -1,6 +1,11 @@
 import os
+import logging
 import discord
 from discord.ext import commands
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 intents = discord.Intents.default()
 intents.members = True
@@ -15,7 +20,7 @@ GUILD_ID = int(GUILD_ID)
 
 @bot.event
 async def on_ready():
-    print(f'Бот {bot.user} готов.')
+    logger.info(f'Бот {bot.user} готов.')
 
 # Гильдейская команда
 @bot.slash_command(guild_ids=[GUILD_ID])

@@ -42,6 +42,8 @@ jobs:
         script: |
           cd /opt/aquabot
           sudo docker-compose down
-          sudo docker image prune -af
+          # Удаление всех неиспользуемых образов, кроме python
+          sudo docker images --filter "dangling=true" -q | xargs -r sudo docker rmi
+          sudo docker images | grep -v 'python' | grep '<none>' | awk '{print $3}' | xargs -r sudo docker rmi
           sudo docker-compose build
           sudo docker-compose up -d
