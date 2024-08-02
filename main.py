@@ -8,7 +8,10 @@ intents.members = True
 bot = discord.Bot(intents=intents)
 
 # Получение ID гильдии из переменной окружения
-GUILD_ID = int(os.getenv('GUILD_ID'))
+GUILD_ID = os.getenv('GUILD_ID')
+if GUILD_ID is None:
+    raise ValueError("GUILD_ID environment variable is not set")
+GUILD_ID = int(GUILD_ID)
 
 @bot.event
 async def on_ready():

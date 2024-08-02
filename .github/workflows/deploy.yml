@@ -20,7 +20,9 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Generate .env file
-      run: echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} > .env
+      run: |
+        echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} > .env
+        echo GUILD_ID=${{ secrets.GUILD_ID }} >> .env
 
     - name: Sync files to server
       env:
@@ -29,16 +31,17 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" . ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/opt/aquabot
+        rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" . root@${{ secrets.SERVER_IP }}:/opt/aquabot
 
     - name: SSH to Server and Deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USERNAME }}
+        username: root
         password: ${{ secrets.SERVER_PASSWORD }}
         script: |
           cd /opt/aquabot
           sudo docker-compose down
+          sudo docker image prune -af
           sudo docker-compose build
           sudo docker-compose up -d
