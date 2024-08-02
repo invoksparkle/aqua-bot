@@ -2,7 +2,7 @@ import os
 import logging
 import discord
 from discord.ext import commands
-import youtube_dl
+import yt_dlp as youtube_dl
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -19,7 +19,7 @@ if GUILD_ID is None:
     raise ValueError("Переменная окружения GUILD_ID не установлена")
 GUILD_ID = int(GUILD_ID)
 
-# Настройка youtube_dl
+# Настройка yt-dlp
 ydl_opts = {
     'format': 'bestaudio/best',
     'postprocessors': [{
