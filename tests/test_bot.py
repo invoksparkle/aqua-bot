@@ -15,7 +15,7 @@ tracemalloc.start()
 os.environ['GUILD_ID'] = '123456789'
 
 class TestBot(unittest.IsolatedAsyncioTestCase):
-    async def SetUp(self):
+    async def asyncSetUp(self):
         self.bot = commands.Bot()
         self.general_cog = GeneralCommands(self.bot)
         self.youtube_cog = YouTubeCommands(self.bot)
