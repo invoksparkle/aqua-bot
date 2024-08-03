@@ -23,7 +23,7 @@ jobs:
         env:
           GUILD_ID: '123456789'
         run: |
-          python -m unittest discover tests
+          python -m unittest discover -v tests
 
   deploy:
     needs: test
