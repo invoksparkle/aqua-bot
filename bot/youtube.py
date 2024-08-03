@@ -3,7 +3,10 @@ from discord.ext import commands
 from yt_dlp import YoutubeDL
 from .utils import ffmpeg_options
 from config.settings import GUILD_ID
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 ydl_opts = {
     'format': 'bestaudio/best',
     'noplaylist': True,
@@ -50,10 +53,11 @@ class YouTubeCommands(commands.Cog):
                     thumbnail_url = f'https://img.youtube.com/vi/{info["id"]}/maxresdefault.jpg'
                 embed = discord.Embed(title="Сейчас играет", description=info['title'])
                 embed.set_image(url=thumbnail_url)
-
+                vc.play(discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options))
+                logger.info(f"Attempting to play URL: {url2}")
                 await ctx.respond(embed=embed)
         except Exception as e:
-            await ctx.respond("Произошла ошибка при попытке воспроизвести аудио.")
+            await ctx.respond(f"Произошла ошибка при попытке воспроизвести аудио. {str(e)}")
             raise e
 
     @commands.slash_command(guild_ids=[GUILD_ID])
