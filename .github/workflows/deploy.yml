@@ -16,14 +16,15 @@ jobs:
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    
+    - name: Set Docker image tag
+      run: echo "IMAGE_TAG=${{ github.run_number }}" >> $GITHUB_ENV
 
     - name: Generate .env file
       run: |
         echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} > .env
         echo GUILD_ID=${{ secrets.GUILD_ID }} >> .env
-    
-    - name: Set Docker image tag
-      run: echo "IMAGE_TAG=${{ github.run_number }}" >> $GITHUB_ENV
+        echo IMAGE_TAG=${{ env.IMAGE_TAG }} >> .env
       
     
     - name: Sync files to server
