@@ -48,7 +48,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
 
     @patch('bot.youtube.YoutubeDL')
-    async def test_play_command_string_thumbnail(self, mock_YoutubeDL):
+    async def test_play_command_high_quality_thumbnail(self, mock_YoutubeDL):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_ctx.defer = AsyncMock()
         mock_ctx.respond = AsyncMock()
@@ -82,20 +82,29 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(embed, "Embed should not be None")
         self.assertEqual(embed.image.url, 'http://example.com/high_quality.jpg')
 
-        # Проверяем вызов к maxresdefault.jpg
-        mock_ydl_instance.extracct_info.return_value['thumbnails'] = []
-        await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
+    @patch('bot.youtube.YoutubeDL')
+    async def test_play_command_fallback_thumbnail(self, mock_YoutubeDL):
+        mock_ctx = AsyncMock(spec=ApplicationContext)
+        mock_ctx.defer = AsyncMock()
+        mock_ctx.respond = AsyncMock()
+        mock_ctx.author.voice = MagicMock()
+        mock_ctx.author.voice.channel.connect = AsyncMock()
+
+        mock_ydl_instance = MagicMock()
+        mock_ydl_instance.extracct_info.return_value = {
+            'url': 'http://example.com/audio',
+            'title': 'Test Title',
+            'thumbnails': [],  # Пустой список миниатюр
+            'id': 'test_id'
+        }
+        mock_YoutubeDL.return_value.__enter__.return_value = mock_ydl_instance
+        with patch('bot.youtube.discord.FFmpegOpusAudio.from_probe', new_callable=AsyncMock) as mock_from_probe:
+            await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
+        mock_ctx.respond.assert_called_once()
         call_args = mock_ctx.respond.call_args
-        if call_args:
-            if call_args.args:
-                embed = call_args.args[0]
-            else:
-                embed = call_args.kwargs.get('embed')
-        else:
-            embed = None
+        embed = call_args.kwargs.get('embed') if call_args.kwargs else call_args.args[0]
         self.assertIsNotNone(embed, "Embed should not be None")
         self.assertEqual(embed.image.url, 'https://img.youtube.com/vi/test_id/maxresdefault.jpg')
-
 
 if __name__ == '__main__':
     unittest.main()
