@@ -75,7 +75,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         if call_args and call_args[0]:
             embed = call_args[0][0]
         else:
-            embed = call_args.kwargs('embed') if call_args else None
+            embed = call_args.kwargs.get('embed') if call_args else None
         self.assertIsNotNone(embed, "Embed should not be None")
         self.assertEqual(embed.image.url, 'http://example.com/high_quality.jpg')
 
