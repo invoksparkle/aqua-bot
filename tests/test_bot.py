@@ -72,10 +72,13 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
 
         mock_ctx.respond.assert_called_once()
         call_args = mock_ctx.respond.call_args
-        if call_args and call_args[0]:
-            embed = call_args[0][0]
+        if call_args:
+            if call_args.args:
+                embed = call_args.args[0]
+            else:
+                embed = call_args.kwargs.get('embed') 
         else:
-            embed = call_args.kwargs.get('embed') if call_args else None
+            embed = None
         self.assertIsNotNone(embed, "Embed should not be None")
         self.assertEqual(embed.image.url, 'http://example.com/high_quality.jpg')
 
