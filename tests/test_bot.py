@@ -47,5 +47,30 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_voice_client.disconnect.assert_called_once()
         mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
 
+    @patch('bot.youtube.YoutubeDL')
+    async def test_play_command_string_thumbnail(self, mock_YoutubeDL):
+        mock_ctx = AsyncMock(spec=ApplicationContext)
+        mock_ctx.defer = AsyncMock()
+        mock_ctx.respond = AsyncMock()
+        mock_ctx.author.voice = MagicMock()
+        mock_ctx.author.voice.channel.connect = AsyncMock()
+
+        mock_ydl_instance = MagicMock()
+        mock_ydl_instance.extract_info.return_value = {
+            'url': 'http://example.com/audio',
+            'title': 'Test Title',
+            'thumbnail': 'http://example.com/thumbnail.jpg',
+            'id': 'test_id'
+        }
+        mock_YoutubeDL.return_value.__enter__.return_value = mock_ydl_instance
+
+        with patch('bot.youtube.discord.FFmpegOpusAudio.from_probe', new_callable=AsyncMock) as mock_from_probe:
+            await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
+
+        mock_ctx.respond.assert_called_once()
+        embed = mock_ctx.respond.call_args[0][0]
+        self.assertEqual(embed.image.url, 'http://example.com/thumbnail.jpg')
+
+
 if __name__ == '__main__':
     unittest.main()
