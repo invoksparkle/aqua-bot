@@ -14,27 +14,24 @@ tracemalloc.start()
 # Устанавливаем заглушку для GUILD_ID
 os.environ['GUILD_ID'] = '123456789'
 
-class TestBot(unittest.TestCase):
-    async def asyncSetUp(self):
+class TestBot(unittest.IsolatedAsyncioTestCase):
+    async def SetUp(self):
         self.bot = commands.Bot()
         self.general_cog = GeneralCommands(self.bot)
         self.youtube_cog = YouTubeCommands(self.bot)
     
-    @unittest.IsolatedAsyncioTestCase.asyncTest
     async def test_hello_command_exists(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_ctx.author.name = "TestUser"
         await self.general_cog.hello(mock_ctx)
         mock_ctx.respond.assert_called_once_with("Привет, TestUser!")
 
-    @unittest.IsolatedAsyncioTestCase.asyncTest
     async def test_play_command_no_voice_channel(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_ctx.author.voice = None
         await self.youtube_cog.play(mock_ctx, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         mock_ctx.respond.assert_called_once_with("Вы должны быть в голосовом канале, чтобы использовать эту команду.")
 
-    @unittest.IsolatedAsyncioTestCase.asyncTest
     async def test_stop_command(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_voice_client = AsyncMock()
