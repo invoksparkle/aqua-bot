@@ -53,7 +53,8 @@ class YouTubeCommands(commands.Cog):
                     thumbnail_url = f'https://img.youtube.com/vi/{info["id"]}/maxresdefault.jpg'
                 embed = discord.Embed(title="Сейчас играет", description=info['title'])
                 embed.set_image(url=thumbnail_url)
-                vc.play(discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options))
+                audio_source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
+                vc.play(audio_source)
                 logger.info(f"Attempting to play URL: {url2}")
                 await ctx.respond(embed=embed)
         except Exception as e:
