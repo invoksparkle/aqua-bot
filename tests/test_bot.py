@@ -24,12 +24,12 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_ctx.respond = AsyncMock()
         mock_ctx.author.name = "TestUser"
         await self.general_cog.hello.callback(self.general_cog, mock_ctx)
-        mock_ctx.respond.assert_called_once_with("Привет, TestUser!")
+        mock_ctx.respond.assert_called_once_with("Привет, {mock_ctx.author.name}!")
 
     async def test_play_command_no_voice_channel(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_ctx.author.voice = None
-        await self.youtube_cog.play(mock_ctx, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         mock_ctx.respond.assert_called_once_with("Вы должны быть в голосовом канале, чтобы использовать эту команду.")
 
     async def test_stop_command(self):
@@ -37,7 +37,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_voice_client = AsyncMock()
         mock_ctx.voice_client = mock_voice_client
         mock_voice_client.is_playing.return_value = True
-        await self.youtube_cog.stop(mock_ctx)
+        await self.youtube_cog.stop.callback(self.youtube_cog, mock_ctx)
         mock_voice_client.stop.assert_called_once()
         mock_voice_client.disconnect.assert_called_once()
         mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
