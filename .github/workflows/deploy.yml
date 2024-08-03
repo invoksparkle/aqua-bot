@@ -23,7 +23,8 @@ jobs:
         echo GUILD_ID=${{ secrets.GUILD_ID }} >> .env
     
     - name: Set Docker image tag
-      run: echo "IMAGE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+      run: echo "IMAGE_TAG=${{ github.run_number }}" >> $GITHUB_ENV
+      
     
     - name: Sync files to server
       env:
