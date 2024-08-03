@@ -42,7 +42,9 @@ class YouTubeCommands(commands.Cog):
                 if 'entries' in info:
                     info = info['entries'][0]
                 url2 = info['url']
-                thumbnail_url = info['thumbnails']
+                thumbnail_url = info.get('thumbnail', [{}])[0].get('url', '')
+                if len(thumbnail_url) > 2048 or not thumbnail_url.startswith('http'):
+                    thumbnail_url = 'https://img.youtube.com/vi/{}/default.jpg'.format(info['id'])
 
                 source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
                 vc.play(source)
