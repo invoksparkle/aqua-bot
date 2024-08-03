@@ -91,7 +91,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_ctx.author.voice.channel.connect = AsyncMock()
 
         mock_ydl_instance = MagicMock()
-        mock_ydl_instance.extracct_info.return_value = {
+        mock_ydl_instance.extract_info.return_value = {
             'url': 'http://example.com/audio',
             'title': 'Test Title',
             'thumbnails': [],  # Пустой список миниатюр
