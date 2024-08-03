@@ -72,7 +72,7 @@ class YouTubeCommands(commands.Cog):
         """Остановить воспроизведение и отключиться от голосового канала"""
         if ctx.voice_client:
             if ctx.voice_client.is_playing():
-                ctx.voice_client.stop()
+                await ctx.voice_client.stop()
             await ctx.voice_client.disconnect()
             await ctx.respond("Остановлено и отключено от голосового канала.")
         else:
