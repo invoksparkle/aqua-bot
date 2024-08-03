@@ -22,15 +22,15 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
 
     async def test_stop_command(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
-        mock_voice_client = MagicMock()
+        mock_voice_client = AsyncMock()
         mock_voice_client.is_playing.return_value = True
         mock_voice_client.stop = AsyncMock()
         mock_voice_client.disconnect = AsyncMock()
         mock_ctx.voice_client = mock_voice_client
         mock_ctx.respond = AsyncMock()
         await self.youtube_cog.stop.callback(self.youtube_cog, mock_ctx)
-        await mock_voice_client.stop.assert_awaited_once()
-        await mock_voice_client.disconnect.assert_awaited_once()
+        mock_voice_client.stop.assert_awaited_once()
+        mock_voice_client.disconnect.assert_awaited_once()
         mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
 
     @patch('bot.utils.YoutubeDL')
