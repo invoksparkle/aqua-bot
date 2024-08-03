@@ -5,7 +5,7 @@ from .utils import ffmpeg_options, YouTubeUtils
 from config.settings import GUILD_ID
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s', handlers=[logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
 class YouTubeCommands(commands.Cog):
@@ -34,7 +34,7 @@ class YouTubeCommands(commands.Cog):
         vc = await voice_channel.connect()
 
         try:
-            info = self.youtube_utils.extract_info(url)
+            info = await self.bot.loop.run_in_executor(None, self.youtube_utils.extract_info, url)
             url2 = info['url']
             thumbnail_url = self.youtube_utils.get_thumbnail_url(info)
 
@@ -45,7 +45,6 @@ class YouTubeCommands(commands.Cog):
 
             audio_source = await FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
             vc.play(audio_source)
-            logger.info(f"Attempting to play URL: {url2}")
             await ctx.respond(embed=embed, view=view)
         except Exception as e:
             await ctx.respond(f"Произошла ошибка при попытке воспроизвести аудио. {str(e)}")
