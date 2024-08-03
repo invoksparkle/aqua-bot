@@ -11,7 +11,6 @@ import asyncio
 asyncio.set_event_loop(asyncio.new_event_loop())
 tracemalloc.start()
 
-# Устанавливаем заглушку для GUILD_ID
 os.environ['GUILD_ID'] = '123456789'
 
 class TestBot(unittest.IsolatedAsyncioTestCase):
@@ -22,6 +21,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
     
     async def test_hello_command_exists(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
+        mock_ctx.respond = AsyncMock()
         mock_ctx.author.name = "TestUser"
         await self.general_cog.hello.callback(self.general_cog, mock_ctx)
         mock_ctx.respond.assert_called_once_with("Привет, TestUser!")
@@ -29,7 +29,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
     async def test_play_command_no_voice_channel(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_ctx.author.voice = None
-        await self.youtube_cog.play.callback(mock_ctx, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        await self.youtube_cog.play(mock_ctx, "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         mock_ctx.respond.assert_called_once_with("Вы должны быть в голосовом канале, чтобы использовать эту команду.")
 
     async def test_stop_command(self):
