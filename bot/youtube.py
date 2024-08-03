@@ -29,10 +29,10 @@ class YouTubeCommands(commands.Cog):
     async def play(self, ctx: discord.ApplicationContext, url: str):
         """Воспроизвести аудио из видео на YouTube"""
         await ctx.defer()
-        voice_channel = ctx.author.voice.channel
-        if not voice_channel:
+        if ctx.author.voice is None:
             await ctx.respond("Вы должны быть в голосовом канале, чтобы использовать эту команду.")
             return
+        voice_channel = ctx.author.voice.channel
 
         vc = await voice_channel.connect()
 
@@ -62,7 +62,7 @@ class YouTubeCommands(commands.Cog):
         """Остановить воспроизведение и отключиться от голосового канала"""
         vc = ctx.voice_client
         if vc and vc.is_playing():
-            vc.stop()
+            await vc.stop()
         if vc:
             await vc.disconnect()
         await ctx.respond("Остановлено и отключено от голосового канала.")

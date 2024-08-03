@@ -24,7 +24,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_ctx.respond = AsyncMock()
         mock_ctx.author.name = "TestUser"
         await self.general_cog.hello.callback(self.general_cog, mock_ctx)
-        mock_ctx.respond.assert_called_once_with(f"Привет, {mock_ctx.author.name}!")
+        mock_ctx.respond.assert_called_once_with(f"Привет, {mock_ctx.author}!")
 
     async def test_play_command_no_voice_channel(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
