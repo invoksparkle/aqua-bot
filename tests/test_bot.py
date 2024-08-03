@@ -7,7 +7,7 @@ from bot.general import GeneralCommands
 from bot.youtube import YouTubeCommands
 import asyncio
 
-asyncio.set_event_loop_policy(asyncio.new_event_loop())
+asyncio.set_event_loop(asyncio.new_event_loop())
 
 # Устанавливаем заглушку для GUILD_ID
 os.environ['GUILD_ID'] = '123456789'
@@ -40,6 +40,6 @@ class TestBot(unittest.TestCase):
         mock_voice_client.stop.assert_called_once()
         mock_voice_client.disconnect.assert_called_once()
         mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
-        
+
 if __name__ == '__main__':
     unittest.main()
