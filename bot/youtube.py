@@ -3,7 +3,6 @@ from discord.ext import commands
 from yt_dlp import YoutubeDL
 from .utils import ffmpeg_options
 from config.settings import GUILD_ID
-import requests
 
 ydl_opts = {
     'format': 'bestaudio/best',
@@ -42,16 +41,15 @@ class YouTubeCommands(commands.Cog):
                 if 'entries' in info:
                     info = info['entries'][0]
                 url2 = info['url']
-                if isinstance(info.get('thumbnail'), str):
+                if isinstance(info.get('thumbnails'), list):
+                    thumbnails = sorted(info.get('thumbnails', []), key=lambda x: x.get('preference', -1), reverse=True)
+                    thumbnail_url = next((t['url'] for t in thumbnails if t.get('url')), None)
+                elif isinstance(info.get('thumbnail'), str):
                     thumbnail_url = info['thumbnail']
                 else:
-                    thumbnail_url = info.get('thumbnail', [{}])[0].get('url', '')
-                if len(thumbnail_url) > 2048 or not thumbnail_url.startswith('http'):
-                    thumbnail_url = 'https://img.youtube.com/vi/{}/default.jpg'.format(info['id'])
-
-                source = await discord.FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
-                vc.play(source)
-
+                    thumbnail_url = None
+                if not thumbnail_url or len(thumbnail_url) > 2048 or not thumbnail_url.startswith("http"):
+                    thumbnail_url = f'https://img.youtube.com/vi/{info["id"]}/maxresdefault.jpg'
                 embed = discord.Embed(title="Сейчас играет", description=info['title'])
                 embed.set_image(url=thumbnail_url)
 

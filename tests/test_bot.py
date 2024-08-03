@@ -59,7 +59,10 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_ydl_instance.extract_info.return_value = {
             'url': 'http://example.com/audio',
             'title': 'Test Title',
-            'thumbnail': 'http://example.com/thumbnail.jpg',
+            'thumbnails': [
+                {'url': 'http://example.com/low_quality.jpg', 'preference': 1},
+                {'url': 'http://example.com/high_quality.jpg', 'preference': 2}
+            ],
             'id': 'test_id'
         }
         mock_YoutubeDL.return_value.__enter__.return_value = mock_ydl_instance
@@ -70,6 +73,12 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_ctx.respond.assert_called_once()
         embed = mock_ctx.respond.call_args[0][0]
         self.assertEqual(embed.image.url, 'http://example.com/thumbnail.jpg')
+
+        # Проверяем вызов к maxresdefault.jpg
+        mock_ydl_instance.extracct_info.return_value['thumbnails'] = []
+        await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
+        embed = mock_ctx.respond.call_args[0][0]
+        self.assertEqual(embed.image.url, 'https://img.youtube.com/vi/test_id/maxresdefault.jpg')
 
 
 if __name__ == '__main__':
