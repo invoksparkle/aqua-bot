@@ -5,7 +5,7 @@ from .utils import ffmpeg_options, YouTubeUtils
 from config.settings import GUILD_ID
 import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s', handlers=[logging.StreamHandler()])
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s %(message)s', handlers=[logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
 class YouTubeCommands(commands.Cog):
