@@ -50,6 +50,6 @@ jobs:
     - name: Notify Discord
       uses: Ilshidur/action-discord@master
       env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
       with:
         args: 'Aquabot успешно развернут! Версия: ${{ env.IMAGE_TAG }}'
