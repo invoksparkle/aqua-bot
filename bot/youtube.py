@@ -44,8 +44,6 @@ class YouTubeCommands(commands.Cog):
                 if isinstance(info.get('thumbnails'), list):
                     thumbnails = sorted(info.get('thumbnails', []), key=lambda x: x.get('preference', -1), reverse=True)
                     thumbnail_url = next((t['url'] for t in thumbnails if t.get('url')), None)
-                elif isinstance(info.get('thumbnail'), str):
-                    thumbnail_url = info['thumbnail']
                 else:
                     thumbnail_url = None
                 if not thumbnail_url or len(thumbnail_url) > 2048 or not thumbnail_url.startswith("http"):

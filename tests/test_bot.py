@@ -71,8 +71,13 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
             await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
 
         mock_ctx.respond.assert_called_once()
-        embed = mock_ctx.respond.call_args[0][0]
-        self.assertEqual(embed.image.url, 'http://example.com/thumbnail.jpg')
+        call_args = mock_ctx.respond.call_args
+        if call_args and call_args[0]:
+            embed = call_args[0][0]
+        else:
+            embed = call_args.kwargs('embed') if call_args else None
+        self.assertIsNotNone(embed, "Embed should not be None")
+        self.assertEqual(embed.image.url, 'http://example.com/high_quality.jpg')
 
         # Проверяем вызов к maxresdefault.jpg
         mock_ydl_instance.extracct_info.return_value['thumbnails'] = []
