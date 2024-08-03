@@ -2,7 +2,11 @@ version: '3.8'
 
 services:
   aquabot:
-    build: .
+    build:
+      context: .
+      args:
+        - IMAGE_TAG=${IMAGE_TAG}
+    image: aquabot:${IMAGE_TAG}
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - GUILD_ID=${GUILD_ID}

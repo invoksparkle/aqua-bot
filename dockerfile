@@ -1,3 +1,6 @@
+ARG IMAGE_TAG
+
+
 # Используем официальный образ Python 3.12
 FROM python:3.12
 
@@ -14,5 +17,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем остальные файлы проекта в рабочую директорию
 COPY . .
 
+# Указываем версию образа
+LABEL version=$IMAGE_TAG
+
 # Указываем команду для запуска бота
 CMD ["python", "main.py"]
+
