@@ -1,31 +1,17 @@
-import os
 import unittest
-import tracemalloc
 from unittest.mock import AsyncMock, MagicMock, patch
 from discord.ext import commands
 from discord import ApplicationContext
-from bot.general import GeneralCommands
 from bot.youtube import YouTubeCommands
 import asyncio
 
 asyncio.set_event_loop(asyncio.new_event_loop())
-tracemalloc.start()
 
-os.environ['GUILD_ID'] = '123456789'
-
-class TestBot(unittest.IsolatedAsyncioTestCase):
+class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.bot = commands.Bot()
-        self.general_cog = GeneralCommands(self.bot)
         self.youtube_cog = YouTubeCommands(self.bot)
     
-    async def test_hello_command_exists(self):
-        mock_ctx = AsyncMock(spec=ApplicationContext)
-        mock_ctx.respond = AsyncMock()
-        mock_ctx.author.name = "TestUser"
-        await self.general_cog.hello.callback(self.general_cog, mock_ctx)
-        mock_ctx.respond.assert_called_once_with(f"Привет, {mock_ctx.author}!")
-
     async def test_play_command_no_voice_channel(self):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_ctx.defer = AsyncMock()
@@ -47,7 +33,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_voice_client.disconnect.assert_called_once()
         mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
 
-    @patch('bot.youtube.YoutubeDL')
+    @patch('bot.utils.YoutubeDL')
     async def test_play_command_high_quality_thumbnail(self, mock_YoutubeDL):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_ctx.defer = AsyncMock()
@@ -82,7 +68,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(embed, "Embed should not be None")
         self.assertEqual(embed.image.url, 'http://example.com/high_quality.jpg')
 
-    @patch('bot.youtube.YoutubeDL')
+    @patch('bot.utils.YoutubeDL')
     async def test_play_command_fallback_thumbnail(self, mock_YoutubeDL):
         mock_ctx = AsyncMock(spec=ApplicationContext)
         mock_ctx.defer = AsyncMock()
@@ -94,7 +80,7 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
         mock_ydl_instance.extract_info.return_value = {
             'url': 'http://example.com/audio',
             'title': 'Test Title',
-            'thumbnails': [],  # Пустой список миниатюр
+            'thumbnails': [], 
             'id': 'test_id'
         }
         mock_YoutubeDL.return_value.__enter__.return_value = mock_ydl_instance

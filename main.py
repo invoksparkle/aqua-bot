@@ -11,7 +11,6 @@ intents.members = True
 
 bot = commands.Bot(intents=intents)
 
-# Загрузка команд и событий
 extensions = ['bot.general', 'bot.youtube', 'bot.events']
 for ext in extensions:
     bot.load_extension(ext)
