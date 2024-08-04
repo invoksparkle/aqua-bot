@@ -29,12 +29,12 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             mock_ctx = AsyncMock(spec=ApplicationContext)
             mock_voice_client = AsyncMock()
             mock_voice_client.is_playing.return_value = True
-            mock_voice_client.stop = AsyncMock()
+            mock_voice_client.stop = MagicMock()
             mock_voice_client.disconnect = AsyncMock()
             mock_ctx.voice_client = mock_voice_client
             mock_ctx.respond = AsyncMock()
             await self.youtube_cog.stop.callback(self.youtube_cog, mock_ctx)
-            mock_voice_client.stop.assert_awaited_once()
+            mock_voice_client.stop.assert_called_once()
             mock_voice_client.disconnect.assert_awaited_once()
             mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
 
