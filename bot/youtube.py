@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord import FFmpegOpusAudio
+from discord import FFmpegPCMAudio
 from .utils import ffmpeg_options, YouTubeUtils
 from config.settings import GUILD_ID
 import logging
@@ -11,16 +11,16 @@ logger = logging.getLogger(__name__)
 class YouTubeCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.volume = 0.5
+        self.volume = 0.5  # Начальный уровень громкости
         self.youtube_utils = YouTubeUtils()
 
     async def change_volume(self, ctx, change):
-        if ctx.voice_client:
-            self.volume = max(0.0, min(2.0, self.volume + change))
+        if ctx.voice_client and ctx.voice_client.source:
+            self.volume = max(0.0, min(2.0, self.volume + change))  # Ограничение громкости от 0% до 200%
             ctx.voice_client.source.volume = self.volume
             await ctx.respond(f"Громкость установлена на {int(self.volume * 100)}%")
         else:
-            await ctx.respond("Бот не подключен к голосовому каналу.")
+            await ctx.respond("Бот не подключен к голосовому каналу или источник не поддерживает изменение громкости.")
 
     @commands.slash_command(guild_ids=[GUILD_ID])
     async def play(self, ctx: discord.ApplicationContext, url: str):
@@ -43,7 +43,8 @@ class YouTubeCommands(commands.Cog):
 
             view = self.create_volume_buttons()
 
-            audio_source = await FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
+            audio_source = FFmpegPCMAudio(url2, **ffmpeg_options)
+            audio_source = discord.PCMVolumeTransformer(audio_source, volume=self.volume)  # Поддержка громкости
             vc.play(audio_source, after=lambda e: self.bot.loop.create_task(self.disconnect_after_playback(vc)))
             await ctx.respond(embed=embed, view=view)
         except Exception as e:

@@ -60,7 +60,7 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             }
             mock_YoutubeDL.return_value.__enter__.return_value = mock_ydl_instance
 
-            with patch('bot.youtube.discord.FFmpegOpusAudio.from_probe', new_callable=AsyncMock) as mock_from_probe:
+            with patch('bot.youtube.discord.FFmpegPCMAudio', new_callable=AsyncMock) as mock_from_probe:
                 await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
 
             mock_ctx.respond.assert_called_once()
@@ -93,7 +93,7 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
                 'id': 'test_id'
             }
             mock_YoutubeDL.return_value.__enter__.return_value = mock_ydl_instance
-            with patch('bot.youtube.discord.FFmpegOpusAudio.from_probe', new_callable=AsyncMock) as mock_from_probe:
+            with patch('bot.youtube.discord.FFmpegPCMAudio', new_callable=AsyncMock) as mock_from_probe:
                 await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
             mock_ctx.respond.assert_called_once()
             call_args = mock_ctx.respond.call_args
@@ -106,22 +106,26 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             warnings.simplefilter("ignore", category=RuntimeWarning)
             mock_ctx = AsyncMock(spec=ApplicationContext)
             mock_ctx.voice_client = AsyncMock()
+            mock_ctx.voice_client.source = MagicMock()
             mock_ctx.respond = AsyncMock()
             self.youtube_cog.volume = 0.5
 
             await self.youtube_cog.volume_up.callback(self.youtube_cog, mock_ctx)
             mock_ctx.respond.assert_called_once_with("Громкость установлена на 60%")
+            self.assertEqual(mock_ctx.voice_client.source.volume, 0.6)
 
     async def test_volume_down_command(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             mock_ctx = AsyncMock(spec=ApplicationContext)
             mock_ctx.voice_client = AsyncMock()
+            mock_ctx.voice_client.source = MagicMock()
             mock_ctx.respond = AsyncMock()
             self.youtube_cog.volume = 0.5
 
             await self.youtube_cog.volume_down.callback(self.youtube_cog, mock_ctx)
             mock_ctx.respond.assert_called_once_with("Громкость установлена на 40%")
+            self.assertEqual(mock_ctx.voice_client.source.volume, 0.4)
 
     async def test_disconnect_after_playback(self):
         with warnings.catch_warnings():
