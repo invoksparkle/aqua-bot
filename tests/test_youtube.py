@@ -39,7 +39,7 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
 
     @patch('bot.utils.YoutubeDL')
-    @patch('bot.youtube.FFmpegPCMAudio', new_callable=AsyncMock)
+    @patch('discord.FFmpegPCMAudio', new_callable=AsyncMock)
     async def test_play_command_high_quality_thumbnail(self, mock_FFmpegPCMAudio, mock_YoutubeDL):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
@@ -76,7 +76,7 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(embed.image.url, 'http://example.com/high_quality.jpg')
 
     @patch('bot.utils.YoutubeDL')
-    @patch('bot.youtube.FFmpegPCMAudio', new_callable=AsyncMock)
+    @patch('discord.FFmpegPCMAudio', new_callable=AsyncMock)
     async def test_play_command_fallback_thumbnail(self, mock_FFmpegPCMAudio, mock_YoutubeDL):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)

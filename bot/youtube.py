@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord import FFmpegPCMAudio
+from discord import FFmpegPCMAudio, PCMVolumeTransformer
 from .utils import ffmpeg_options, YouTubeUtils
 from config.settings import GUILD_ID
 import logging
@@ -44,7 +44,7 @@ class YouTubeCommands(commands.Cog):
             view = self.create_volume_buttons()
 
             audio_source = FFmpegPCMAudio(url2, **ffmpeg_options)
-            audio_source = discord.PCMVolumeTransformer(audio_source, volume=self.volume)  # Поддержка громкости
+            audio_source = PCMVolumeTransformer(audio_source, volume=self.volume)  # Поддержка громкости
             vc.play(audio_source, after=lambda e: self.bot.loop.create_task(self.disconnect_after_playback(vc)))
             await ctx.respond(embed=embed, view=view)
         except Exception as e:
@@ -76,7 +76,7 @@ class YouTubeCommands(commands.Cog):
         """Остановить воспроизведение и отключиться от голосового канала"""
         if ctx.voice_client:
             if ctx.voice_client.is_playing():
-                await ctx.voice_client.stop()
+                ctx.voice_client.stop()
             await ctx.voice_client.disconnect()
             await ctx.respond("Остановлено и отключено от голосового канала.")
         else:
