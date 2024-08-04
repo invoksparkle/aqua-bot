@@ -39,7 +39,8 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             mock_ctx.respond.assert_called_once_with("Остановлено и отключено от голосового канала.")
 
     @patch('bot.utils.YoutubeDL')
-    async def test_play_command_high_quality_thumbnail(self, mock_YoutubeDL):
+    @patch('bot.youtube.FFmpegPCMAudio', new_callable=AsyncMock)
+    async def test_play_command_high_quality_thumbnail(self, mock_FFmpegPCMAudio, mock_YoutubeDL):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             mock_ctx = AsyncMock(spec=ApplicationContext)
@@ -60,8 +61,7 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             }
             mock_YoutubeDL.return_value.__enter__.return_value = mock_ydl_instance
 
-            with patch('bot.youtube.discord.FFmpegPCMAudio', new_callable=AsyncMock) as mock_from_probe:
-                await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
+            await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
 
             mock_ctx.respond.assert_called_once()
             call_args = mock_ctx.respond.call_args
@@ -76,7 +76,8 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(embed.image.url, 'http://example.com/high_quality.jpg')
 
     @patch('bot.utils.YoutubeDL')
-    async def test_play_command_fallback_thumbnail(self, mock_YoutubeDL):
+    @patch('bot.youtube.FFmpegPCMAudio', new_callable=AsyncMock)
+    async def test_play_command_fallback_thumbnail(self, mock_FFmpegPCMAudio, mock_YoutubeDL):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             mock_ctx = AsyncMock(spec=ApplicationContext)
@@ -93,8 +94,9 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
                 'id': 'test_id'
             }
             mock_YoutubeDL.return_value.__enter__.return_value = mock_ydl_instance
-            with patch('bot.youtube.discord.FFmpegPCMAudio', new_callable=AsyncMock) as mock_from_probe:
-                await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
+
+            await self.youtube_cog.play.callback(self.youtube_cog, mock_ctx, "http://example.com/video")
+            
             mock_ctx.respond.assert_called_once()
             call_args = mock_ctx.respond.call_args
             embed = call_args.kwargs.get('embed') if call_args.kwargs else call_args.args[0]
