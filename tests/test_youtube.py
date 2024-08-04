@@ -101,5 +101,27 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             self.assertIsNotNone(embed, "Embed should not be None")
             self.assertEqual(embed.image.url, 'https://img.youtube.com/vi/test_id/maxresdefault.jpg')
 
+    async def test_volume_up_command(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            mock_ctx = AsyncMock(spec=ApplicationContext)
+            mock_ctx.voice_client = AsyncMock()
+            mock_ctx.respond = AsyncMock()
+            self.youtube_cog.volume = 0.5
+
+            await self.youtube_cog.volume_up.callback(self.youtube_cog, mock_ctx)
+            mock_ctx.respond.assert_called_once_with("Громкость установлена на 60%")
+
+    async def test_volume_down_command(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            mock_ctx = AsyncMock(spec=ApplicationContext)
+            mock_ctx.voice_client = AsyncMock()
+            mock_ctx.respond = AsyncMock()
+            self.youtube_cog.volume = 0.5
+
+            await self.youtube_cog.volume_down.callback(self.youtube_cog, mock_ctx)
+            mock_ctx.respond.assert_called_once_with("Громкость установлена на 40%")
+
 if __name__ == '__main__':
     unittest.main()
