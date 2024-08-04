@@ -52,7 +52,8 @@ class YouTubeCommands(commands.Cog):
             raise e
 
     async def disconnect_after_playback(self, vc):
-        await vc.disconnect()
+        if vc.is_connected():
+            await vc.disconnect()
 
     def create_volume_buttons(self):
         volume_up = discord.ui.Button(style=discord.ButtonStyle.primary, label="🔊", custom_id="volume_up")
