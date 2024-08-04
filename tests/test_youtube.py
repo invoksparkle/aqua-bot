@@ -123,5 +123,12 @@ class TestYouTubeCommands(unittest.IsolatedAsyncioTestCase):
             await self.youtube_cog.volume_down.callback(self.youtube_cog, mock_ctx)
             mock_ctx.respond.assert_called_once_with("Громкость установлена на 40%")
 
+    async def test_disconnect_after_playback(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            mock_voice_client = AsyncMock()
+            await self.youtube_cog.disconnect_after_playback(mock_voice_client)
+            mock_voice_client.disconnect.assert_awaited_once()
+
 if __name__ == '__main__':
     unittest.main()

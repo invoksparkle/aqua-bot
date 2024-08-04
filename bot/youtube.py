@@ -44,11 +44,14 @@ class YouTubeCommands(commands.Cog):
             view = self.create_volume_buttons()
 
             audio_source = await FFmpegOpusAudio.from_probe(url2, **ffmpeg_options)
-            vc.play(audio_source)
+            vc.play(audio_source, after=lambda e: self.bot.loop.create_task(self.disconnect_after_playback(vc)))
             await ctx.respond(embed=embed, view=view)
         except Exception as e:
             await ctx.respond(f"Произошла ошибка при попытке воспроизвести аудио. {str(e)}")
             raise e
+
+    async def disconnect_after_playback(self, vc):
+        await vc.disconnect()
 
     def create_volume_buttons(self):
         volume_up = discord.ui.Button(style=discord.ButtonStyle.primary, label="🔊", custom_id="volume_up")
